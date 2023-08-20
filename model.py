@@ -37,8 +37,19 @@ class PhoneBookEntry:
 
     def get_field_names(self):
         return [field.name for field in fields(self)]
+    
+    def get_field_values(self):
+        return asdict(self).values()
 
     def to_string(self):
         return '|'.join(asdict(self).values()) + '\n'
-
+    
+    def from_string(self, string):
+        string = string.replace('\n', '')
+        fields = string.split('|')
+        id = fields[0]
+        del fields[0]
+        for field_name, value in zip(self.get_field_names(), fields):
+            setattr(self, field_name, value)
+        return id
 
