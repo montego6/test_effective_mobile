@@ -30,6 +30,15 @@ def switch_phonebook(filename: Annotated[str, typer.Argument()]):
     else:
         change_default_phonebook(filename)
 
+@app.command('add')
+def add_entry():
+    name = typer.prompt('Type first name')
+    second_name = typer.prompt('Type second name')
+    last_name = typer.prompt('Type last name')
+    employee = typer.prompt('Type name of your organization')
+    work_phone = typer.prompt('Type work phone number')
+    mobile_phone = typer.prompt('Type your mobile phone number')
+
 
 @app.command()
 def main(name: str):
