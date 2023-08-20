@@ -1,10 +1,8 @@
 import typer
 from rich import print as rprint
-import json
-from json.decoder import JSONDecodeError
 from typing_extensions import Annotated
 from pathlib import Path
-from utils import create_config_file, CONFIG_FILE
+from utils import create_config_file, CONFIG_FILE, refine_filename, is_book_exist, change_default_phonebook
 
 app = typer.Typer()
 
@@ -12,6 +10,8 @@ app = typer.Typer()
 @app.command('newbook')
 def create_phonebook(filename: Annotated[str, typer.Argument()], 
                      set_default: Annotated[bool, typer.Option('--set-default', '-sd')] = False):
+    filename = refine_filename(filename)
+    
     try:
         with open(filename, 'x') as file:
             pass
@@ -19,24 +19,16 @@ def create_phonebook(filename: Annotated[str, typer.Argument()],
         rprint('[bold red]This phonebook already exists')
     
     if set_default:
-        create_config_file()
-        with open(CONFIG_FILE, 'r') as infile, open(CONFIG_FILE, 'w') as outfile:
-            try:
-                data = json.load(infile)
-            except JSONDecodeError:
-                data = {}
-            finally:
-                data['default-phonebook'] = filename
-                json.dump(data, outfile)
-        
-        
-        # with open('confing.json', 'r') as file:
-        #     raw_data = file.read()
-        #     json_data = json.loads(raw_data)
-        #     json_data['default-phonebook'] = filename
-        # with open('confing.json', 'w') as file:
-        #     file.write(json.dumps(json_data))
+        change_default_phonebook(filename)
 
+
+@app.command('switch')
+def switch_phonebook(filename: Annotated[str, typer.Argument()]):
+    filename = refine_filename(filename)
+    if not is_book_exist(filename):
+        rprint('[bold red]This phonebook doesn''t exist')
+    else:
+        change_default_phonebook(filename)
 
 
 @app.command()
