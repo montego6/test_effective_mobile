@@ -31,3 +31,10 @@ def change_default_phonebook(filename):
         finally:
             data['default-phonebook'] = filename
             json.dump(data, outfile)
+
+
+def get_default_phonebook():
+    with open(CONFIG_FILE, 'r') as conf_file:
+        data = json.load(conf_file)
+        filename = data['default-phonebook']
+    return filename
