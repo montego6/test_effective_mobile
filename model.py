@@ -2,8 +2,12 @@ from dataclasses import dataclass, fields, asdict
 import typing
 import re
 
+
+
+
 @dataclass
 class PhoneBookEntry:
+    id: str = ''
     name:str = ''
     second_name: str = ''
     last_name: str = ''
@@ -20,15 +24,6 @@ class PhoneBookEntry:
         'mobile_phone': r'^((\+\s?7)|8)\s?\(?\d{3}\)?[ -]?\d{3}[ -]?\d{2}[ -]?\d{2}$',
     }
 
-    typer_prompts: typing.ClassVar = {
-        'name': 'Type first name',
-        'second_name': 'Type second name',
-        'last_name': 'Type last name',
-        'employee': 'Type organization name',
-        'work_phone': 'Type work phone',
-        'mobile_phone': 'Type mobile phone',
-
-    }
 
     def validate_field(self, field_name):
         field = getattr(self, field_name)
@@ -47,9 +42,12 @@ class PhoneBookEntry:
     def from_string(self, string):
         string = string.replace('\n', '')
         fields = string.split('|')
-        id = fields[0]
-        del fields[0]
         for field_name, value in zip(self.get_field_names(), fields):
             setattr(self, field_name, value)
-        return id
+        return self
+    
+    def match(self, search_field, search_value, eq, contains):
+        if eq:
+            return getattr(self, search_field) == search_value
+        
 
