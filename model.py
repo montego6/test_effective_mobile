@@ -27,7 +27,6 @@ class PhoneBookEntry:
 
     def validate_field(self, field_name):
         field = getattr(self, field_name)
-        print(re.match(self.validators[field_name], field))
         return bool(re.match(self.validators[field_name], field))
 
     def get_field_names(self):
@@ -46,8 +45,11 @@ class PhoneBookEntry:
             setattr(self, field_name, value)
         return self
     
-    def match(self, search_field, search_value, eq, contains):
+    def match(self, filter_field, filter_value, eq, contains):
         if eq:
-            return getattr(self, search_field) == search_value
-        
+            return getattr(self, filter_field) == filter_value
+        if contains:
+            return getattr(self, filter_field).find(filter_value) != -1
+
+           
 

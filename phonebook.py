@@ -88,18 +88,16 @@ def show_entries():
         console.print(table)
 
 @app.command('edit')
-def edit_entries_command(search_value: Annotated[str, typer.Option()],
-                 search_field: Annotated[SearchFieldChoices, typer.Option()] = SearchFieldChoices.id,
+def edit_entries_command(filter_value: Annotated[str, typer.Option()],
+                 filter_field: Annotated[SearchFieldChoices, typer.Option()] = SearchFieldChoices.id,
                  contains: Annotated[bool, typer.Option()] = False,
                  eq: Annotated[bool, typer.Option()] = True,
                  field: Annotated[ChangeFieldChoices, typer.Option(case_sensitive=False)] = ChangeFieldChoices.name,
                  ):
-    new_value = typer.prompt('Type new value for field')
-    edit_entries(search_field, search_value, field, new_value)
-
-@app.command()
-def main(name: str):
-    print(f'Hello {name}')
+    
+    eq = False if contains else True
+    new_value = typer.prompt(f'Type new value for field {field}')
+    rprint(edit_entries(filter_field, filter_value, field, new_value, eq, contains))
 
 
 if __name__ == '__main__':

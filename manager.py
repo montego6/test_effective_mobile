@@ -19,12 +19,18 @@ def read_all_entries():
     with open(phonebook, 'r') as file:
         return file.readlines()
 
-def edit_entries(search_field, search_value, field, new_value, eq=True, contains=False):
+def edit_entries(filter_field, filter_value, field, new_value, eq=True, contains=False):
     raw_entries = read_all_entries()
     entries = [PhoneBookEntry().from_string(raw_entry) for raw_entry in raw_entries]
+    num_entries_changed = 0
     for entry in entries:
-        if entry.match(search_field, search_value, eq, contains):
+        if entry.match(filter_field, filter_value, eq, contains):
             setattr(entry, field, new_value)
-
+            num_entries_changed += 1
+            if not entry.validate_field(field):
+                return '[bold red]Error - invalid format'
+   
     with open(phonebook, 'w') as file:
         file.writelines([entry.to_string() for entry in entries])
+    
+    return f'[bold green]Success - {num_entries_changed} entries are changed'
