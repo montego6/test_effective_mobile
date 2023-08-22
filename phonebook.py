@@ -4,10 +4,13 @@ from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
 from model import PhoneBookEntry
-from manager import add_entry_to_file, count_entry_lines, read_all_entries
-from utils import CONFIG_FILE, refine_filename, is_book_exist, change_default_phonebook
+from manager import add_entry_to_file, read_all_entries, get_last_id
+from utils import refine_filename, is_book_exist, change_default_phonebook, get_lines_per_page
+import config_commands
+
 
 app = typer.Typer()
+app.add_typer(config_commands.app, name='config')
 console = Console()
 
 
@@ -42,19 +45,21 @@ def add_entry():
         while not entry.validate_field(field_name):
             rprint('[bold red]Invalid format')
             setattr(entry, field_name, typer.prompt(entry.typer_prompts[field_name]))
-    add_entry_to_file(count_entry_lines() + 1, entry.to_string())
+    add_entry_to_file(get_last_id() + 1, entry.to_string())
 
 
 @app.command('show')
 def show_entries():
     table = Table('id', 'First name', 'Second name', 'Last name', 'Organisation', 'Work phone', 'Mobile phone')
     data = read_all_entries()
-    print(data)
+    lines_per_page = get_lines_per_page()
+
     for line in data:
         entry = PhoneBookEntry()
         id = entry.from_string(line)
         table.add_row(id, *entry.get_field_values())
-    console.print(table)
+    with console.pager():
+        console.print(table)
 
 
 @app.command()
