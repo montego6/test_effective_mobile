@@ -34,3 +34,10 @@ def edit_entries(filters, field, new_value, eq_contains, and_or):
         file.writelines([entry.to_string() for entry in entries])
     
     return f'[bold green]Success - {num_entries_changed} entries are changed'
+
+
+def search_entries(filters, eq_contains, and_or):
+    raw_entries = read_all_entries()
+    all_entries = [PhoneBookEntry().from_string(raw_entry) for raw_entry in raw_entries]
+    result = []
+    return [entry for entry in all_entries if entry.match(filters, eq_contains, and_or)]

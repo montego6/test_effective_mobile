@@ -50,8 +50,11 @@ class PhoneBookEntry:
         if eq_contains:
             for field, value in filters:
                 if and_or:
+                    matched = True
                     if getattr(self, field) != value:
+                        matched = False
                         break
+           
                 else:
                     if getattr(self, field) == value:
                         matched = True
@@ -59,12 +62,15 @@ class PhoneBookEntry:
         else:
             for field, value in filters:
                 if and_or:
+                    matched = True
                     if getattr(self, field).find(value) == -1:
+                        matched = False
                         break
                 else:
                     if getattr(self, field).find(value) != -1:
-                        matched = True
+                        matched = True 
                         break
+
         return matched
 
            

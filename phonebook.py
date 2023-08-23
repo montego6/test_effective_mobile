@@ -6,7 +6,7 @@ from typing_extensions import Annotated
 from typing import List, Tuple
 from enum import Enum
 from model import PhoneBookEntry
-from manager import add_entry_to_file, read_all_entries, get_last_id, edit_entries
+from manager import add_entry_to_file, read_all_entries, get_last_id, edit_entries, search_entries
 from utils import refine_filename, is_book_exist, change_default_phonebook
 import config_commands
 
@@ -115,6 +115,24 @@ def edit_entries_command(filters: Annotated[List[str], typer.Option('--filter', 
     new_value = typer.prompt(f'Type new value for field {field}')
     rprint(edit_entries(filters, field, new_value, eq_contains, and_or))
 
+
+@app.command('search')
+def search_entries_command(filters: Annotated[List[str], typer.Option('--filter', '-f', callback=parse_filter)],
+                 contains: Annotated[bool, typer.Option()] = False,
+                 eq: Annotated[bool, typer.Option()] = True,
+                 and_option: Annotated[bool, typer.Option('-and')] = True,
+                 or_option: Annotated[bool, typer.Option('-or')] = False,):
+
+    if not filters:
+        rprint('[bold red]Error - invalid field in filter')
+    eq_contains = False if contains else True
+    and_or = False if or_option else True
+    entries = search_entries(filters, eq_contains, and_or)
+    table = Table('id', 'First name', 'Second name', 'Last name', 'Organisation', 'Work phone', 'Mobile phone')
+    for entry in entries:
+        table.add_row(*entry.get_field_values())
+    with console.pager():
+        console.print(table)
 
 
 
