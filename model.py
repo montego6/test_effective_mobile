@@ -45,11 +45,27 @@ class PhoneBookEntry:
             setattr(self, field_name, value)
         return self
     
-    def match(self, filter_field, filter_value, eq, contains):
-        if eq:
-            return getattr(self, filter_field) == filter_value
-        if contains:
-            return getattr(self, filter_field).find(filter_value) != -1
+    def match(self, filters, eq_contains, and_or):
+        matched = False
+        if eq_contains:
+            for field, value in filters:
+                if and_or:
+                    if getattr(self, field) != value:
+                        break
+                else:
+                    if getattr(self, field) == value:
+                        matched = True
+                        break
+        else:
+            for field, value in filters:
+                if and_or:
+                    if getattr(self, field).find(value) == -1:
+                        break
+                else:
+                    if getattr(self, field).find(value) != -1:
+                        matched = True
+                        break
+        return matched
 
            
 

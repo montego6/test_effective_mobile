@@ -3,10 +3,11 @@ from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
+from typing import List, Tuple
 from enum import Enum
 from model import PhoneBookEntry
 from manager import add_entry_to_file, read_all_entries, get_last_id, edit_entries
-from utils import refine_filename, is_book_exist, change_default_phonebook, get_lines_per_page
+from utils import refine_filename, is_book_exist, change_default_phonebook
 import config_commands
 
 
@@ -39,6 +40,8 @@ class SearchFieldChoices(str, Enum):
     employee: str = 'employee'
     work_phone: str = 'work_phone'
     mobile_phone: str = 'mobile_phone'
+
+filter_choices = [field.value for field in SearchFieldChoices]
 
 
 @app.command('newbook')
@@ -81,23 +84,38 @@ def show_entries():
     table = Table('id', 'First name', 'Second name', 'Last name', 'Organisation', 'Work phone', 'Mobile phone')
     data = read_all_entries()
     for line in data:
-        entry = PhoneBookEntry()
-        entry = entry.from_string(line)
+        entry = PhoneBookEntry().from_string(line)
         table.add_row(*entry.get_field_values())
     with console.pager():
         console.print(table)
 
+def parse_filter(raw_values):
+    result = []
+    for raw_value in raw_values:
+        field, value = raw_value.split('=')
+        if field.strip() not in filter_choices:
+            return []
+        result.append((field.strip(), value.strip()))
+    return result
+
+
 @app.command('edit')
-def edit_entries_command(filter_value: Annotated[str, typer.Option()],
-                 filter_field: Annotated[SearchFieldChoices, typer.Option()] = SearchFieldChoices.id,
+def edit_entries_command(filters: Annotated[List[str], typer.Option('--filter', '-f', callback=parse_filter)],
                  contains: Annotated[bool, typer.Option()] = False,
                  eq: Annotated[bool, typer.Option()] = True,
+                 and_option: Annotated[bool, typer.Option('-and')] = True,
+                 or_option: Annotated[bool, typer.Option('-or')] = False,
                  field: Annotated[ChangeFieldChoices, typer.Option(case_sensitive=False)] = ChangeFieldChoices.name,
                  ):
     
-    eq = False if contains else True
+    if not filters:
+        rprint('[bold red]Error - invalid field in filter')
+    eq_contains = False if contains else True
+    and_or = False if or_option else True
     new_value = typer.prompt(f'Type new value for field {field}')
-    rprint(edit_entries(filter_field, filter_value, field, new_value, eq, contains))
+    rprint(edit_entries(filters, field, new_value, eq_contains, and_or))
+
+
 
 
 if __name__ == '__main__':
