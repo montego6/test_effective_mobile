@@ -1,5 +1,2 @@
-1|kir|al|kir|avar|+79164355678|+79121233456
-2|las|ler|pol|avar|+79121231234|+79121231234
-3|kirill|sergeevich|ulex|newemployee|+79164355678|+79121231234
 4|ksenia|sergeevna|lopareva|trerik|+79121231234|+79456788945
 5|newloki2|sel|asd|red|+79011234567|+79011234567

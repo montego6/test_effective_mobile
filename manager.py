@@ -39,5 +39,16 @@ def edit_entries(filters, field, new_value, eq_contains, and_or):
 def search_entries(filters, eq_contains, and_or):
     raw_entries = read_all_entries()
     all_entries = [PhoneBookEntry().from_string(raw_entry) for raw_entry in raw_entries]
-    result = []
     return [entry for entry in all_entries if entry.match(filters, eq_contains, and_or)]
+
+
+def delete_entries(filters, eq_contains, and_or):
+    raw_entries = read_all_entries()
+    all_entries = [PhoneBookEntry().from_string(raw_entry) for raw_entry in raw_entries]
+    filtered_entries = [entry for entry in all_entries if not entry.match(filters, eq_contains, and_or)]
+    num_deleted_entries = len(all_entries) - len(filtered_entries)
+    
+    with open(phonebook, 'w') as file:
+        file.writelines([entry.to_string() for entry in filtered_entries])
+    
+    return num_deleted_entries
