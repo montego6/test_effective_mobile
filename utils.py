@@ -45,12 +45,3 @@ def get_default_phonebook():
     return filename
 
 
-def get_lines_per_page():
-    with open(CONFIG_FILE, 'r') as conf_file:
-        try:
-            data = json.load(conf_file)
-        except JSONDecodeError:
-            lines_per_page = 5
-        else:
-            lines_per_page = data['pages-count']
-    return lines_per_page
