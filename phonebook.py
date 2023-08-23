@@ -3,7 +3,8 @@ from rich import print as rprint
 from rich.console import Console
 from rich.table import Table
 from typing_extensions import Annotated
-from typing import List, Tuple
+from typing import List
+import os
 from enum import Enum
 from model import PhoneBookEntry
 from manager import add_entry_to_file, read_all_entries, get_last_id, edit_entries, search_entries, delete_entries
@@ -58,6 +59,15 @@ def create_phonebook(filename: Annotated[str, typer.Argument()],
     if set_default:
         change_default_phonebook(filename)
 
+
+@app.command('rmbook')
+def remove_phonebook_command(filename: Annotated[str, typer.Argument()]):
+    filename = refine_filename(filename)
+    if os.path.exists(filename):
+        os.remove(filename)
+        rprint('[bold green]Success - phonebook has been deleted')
+    else:
+        rprint('[bold red]Error - such phonebook doesn''t exist')
 
 @app.command('switch')
 def switch_phonebook(filename: Annotated[str, typer.Argument()]):
