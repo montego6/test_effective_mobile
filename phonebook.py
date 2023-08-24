@@ -79,7 +79,7 @@ def add_entry_command():
     and if value wouldn't pass a validation, you would be asked again.
     """
     entry: PhoneBookEntry = PhoneBookEntry()
-    for field_name in ALL_FIELD_CHOICES:
+    for field_name in typer_prompts.keys():
         setattr(entry, field_name, typer.prompt(typer_prompts[field_name]))
         while not entry.validate_field(field_name):
             rprint("[bold red]Invalid format, try again")
