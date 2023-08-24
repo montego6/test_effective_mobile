@@ -1,15 +1,29 @@
+from model import PhoneBookEntry
+from typing import Callable
+
 class EntryMatcher:
-    def __init__(self, entry) -> None:
+    '''
+    Class for matching entries to chosen filters
+    '''
+    
+    def __init__(self, entry:PhoneBookEntry) -> None:
         self.entry = entry
 
-    def match(self, filters, eq_contains, and_or):
+    def match(self, filters:list[tuple[str, str]], eq_contains:bool, and_or:bool) -> Callable[[list[tuple[str, str]], bool], bool]:
+        '''
+        Main match function that delegates to other funcs
+        according to selected eq or contains option
+        '''
         if eq_contains:
             return self.eqmatch(filters, and_or)
         else:
             return self.containsmatch(filters, and_or)
 
-    def eqmatch(self, filters, and_or):
-        matched = False
+    def eqmatch(self, filters:list[tuple[str, str]], and_or:bool) -> bool:
+        '''
+        Matching for equality with AND or OR logic
+        '''
+        matched:bool = False
         for field, value in filters:
             if and_or:
                 matched = True
@@ -22,8 +36,11 @@ class EntryMatcher:
                     break
         return matched    
             
-    def containsmatch(self, filters, and_or):
-        matched = False
+    def containsmatch(self, filters:list[tuple[str, str]], and_or:bool) -> bool:
+        '''
+        Matching for containment with AND or OR logic
+        '''
+        matched:bool = False
         for field, value in filters:          
             if and_or:
                 matched = True

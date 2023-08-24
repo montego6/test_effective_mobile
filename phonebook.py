@@ -22,7 +22,7 @@ def create_phonebook_command(filename: Annotated[str, typer.Argument(help='Filen
     Create new phonebook with a name FILENAME passed as an argument.
     If --set-default option is used, set new phonebook to default phonebook.
     '''
-    filename = refine_filename(filename)
+    filename:str = refine_filename(filename)
     try:
         with open(filename, 'x') as file:
             pass
@@ -37,7 +37,7 @@ def remove_phonebook_command(filename: Annotated[str, typer.Argument(help='Filen
     '''
     Delete phonebook with name FILENAME.
     '''
-    filename = refine_filename(filename)
+    filename:str = refine_filename(filename)
     if os.path.exists(filename):
         os.remove(filename)
         rprint('[bold green]Success - phonebook has been deleted')
@@ -49,7 +49,7 @@ def switch_phonebook_command(filename: Annotated[str, typer.Argument(help='Filen
     '''
     Set phonebook with name FILENAME as current active phonebook.
     '''
-    filename = refine_filename(filename)
+    filename:str = refine_filename(filename)
     if not is_book_exist(filename):
         rprint('[bold red]Error - this phonebook doesn''t exist')
     else:
@@ -61,7 +61,7 @@ def add_entry_command():
     Add entry to current active phonebook. All field values will be interactively prompted,
     and if value wouldn't pass a validation, you would be asked again.
     '''
-    entry = PhoneBookEntry()
+    entry:PhoneBookEntry = PhoneBookEntry()
     for field_name in ALL_FIELD_CHOICES:
         setattr(entry, field_name, typer.prompt(typer_prompts[field_name]))
         while not entry.validate_field(field_name):
@@ -76,17 +76,21 @@ def show_entries():
     '''
     Show all entries of current active phonebook as a table.
     '''
-    table = Table(*TABLE_HEADER)
-    data = read_all_entries()
+    table:Table = Table(*TABLE_HEADER)
+    data:list[str] = read_all_entries()
     for line in data:
-        entry = PhoneBookEntry().from_string(line)
+        entry:PhoneBookEntry = PhoneBookEntry().from_string(line)
         table.add_row(*entry.get_field_values())
     with console.pager():
         console.print(table)
 
 
-def parse_filter(raw_values):
-    result = []
+def parse_filter(raw_values:list[str]) -> list[tuple[str, str]]:
+    '''
+    Parse filters from string in a format field_name=value to list of tuples in a format [(field_name, value)]
+    If field_name is invalid, returns empty list 
+    '''
+    result:list[tuple[str, str]] = []
     for raw_value in raw_values:
         field, value = raw_value.split('=')
         if field.strip() not in ALL_FIELD_CHOICES:
@@ -113,9 +117,9 @@ def edit_entries_command(filters: Annotated[List[str], typer.Option('--filter', 
     '''
     if not filters:
         rprint('[bold red]Error - invalid field in filter')
-    eq_contains = False if contains else True
-    and_or = False if or_option else True
-    new_value = typer.prompt(f'Type new value for field {field}')
+    eq_contains:bool = False if contains else True
+    and_or:bool = False if or_option else True
+    new_value:str = typer.prompt(f'Type new value for field {field}')
     rprint(edit_entries(filters, field, new_value, eq_contains, and_or))
 
 
@@ -135,10 +139,10 @@ def search_entries_command(filters: Annotated[List[str], typer.Option('--filter'
     '''
     if not filters:
         rprint('[bold red]Error - invalid field in filter')
-    eq_contains = False if contains else True
-    and_or = False if or_option else True
-    entries = search_entries(filters, eq_contains, and_or)
-    table = Table(*TABLE_HEADER)
+    eq_contains:bool = False if contains else True
+    and_or:bool = False if or_option else True
+    entries:list[PhoneBookEntry] = search_entries(filters, eq_contains, and_or)
+    table:Table = Table(*TABLE_HEADER)
     for entry in entries:
         table.add_row(*entry.get_field_values())
     with console.pager():
@@ -160,9 +164,9 @@ def delete_entries_command(filters: Annotated[List[str], typer.Option('--filter'
     '''    
     if not filters:
         rprint('[bold red]Error - invalid field in filter')
-    eq_contains = False if contains else True
-    and_or = False if or_option else True
-    num_deleted = delete_entries(filters, eq_contains, and_or)
+    eq_contains:bool = False if contains else True
+    and_or:bool = False if or_option else True
+    num_deleted:int = delete_entries(filters, eq_contains, and_or)
     rprint(f'[bold green]Success - {num_deleted} entries deleted')
 
 

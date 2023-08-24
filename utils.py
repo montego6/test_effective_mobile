@@ -4,12 +4,18 @@ from json.decoder import JSONDecodeError
 
 CONFIG_FILE = 'config.json'
 
-def create_config_file():
+def create_config_file() -> None:
+    '''
+    Create config file if it doesn't exist
+    '''
     if not path.isfile(CONFIG_FILE):
         with open(CONFIG_FILE, 'x') as file:
             pass
 
-def refine_filename(filename):
+def refine_filename(filename:str) -> str:
+    '''
+    Refines filename in a way that filename will be name.txt
+    '''
     if '.' not in filename:
         filename += '.txt'
     elif not filename.endswith('.txt'):
@@ -17,15 +23,21 @@ def refine_filename(filename):
         filename += '.txt'
     return filename
 
-def is_book_exist(filename):
+def is_book_exist(filename:str) -> bool:
+    '''
+    Check if phonebook exist
+    '''
     return path.isfile(filename)
 
 
-def change_default_phonebook(filename):
+def change_default_phonebook(filename:str) -> None:
+    '''
+    Changes current active phonebook in config file
+    '''
     create_config_file()
     with open(CONFIG_FILE, 'r') as infile:
         try:
-            data = json.load(infile)
+            data:dict[str, str] = json.load(infile)
         except JSONDecodeError:
             data = {}
         finally:
@@ -34,12 +46,15 @@ def change_default_phonebook(filename):
             json.dump(data, outfile)
 
 
-def get_default_phonebook():
+def get_default_phonebook() -> str:
+    '''
+    Gets current active phonebook from config file
+    '''
     with open(CONFIG_FILE, 'r') as conf_file:
         try:
-            data = json.load(conf_file)
+            data: dict[str, str] = json.load(conf_file)
         except JSONDecodeError:
-            filename = ''
+            filename:str = ''
         else:
             filename = data['default-phonebook']
     return filename
